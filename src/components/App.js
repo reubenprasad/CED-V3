@@ -15,16 +15,21 @@ class App extends Component {
 
   async loadBlockchainData() {          //Fetch information from blockchain using web3
     const web3 = window.web3
+    //Retrieve accounts and set current account to the state
     const accounts = await web3.eth.getAccounts()
     this.setState({ account: accounts[0] })
+    //Retrieve network id of current network
     const networkId = await web3.eth.net.getId()
     const networkData = ProductTracker.networks[networkId]
+    //Check if contract is deployed to the current network, else display error
   if(networkData) {
+    //Retrieve contract instance using its ABI and address and set it to the state
     const producttracker = web3.eth.Contract(ProductTracker.abi, networkData.address)
     this.setState({ producttracker })
+    //Retrieve the product count and set it to the state
     const productCount = await producttracker.methods.productCount().call()
     this.setState({ productCount })
-     // Load new products
+     // Load new products listed by manufacturer
      for (var i = 1; i <= productCount; i++) {
       const product = await producttracker.methods.product(i).call()
       if(product.dateOfPurchase==0x00){
@@ -34,22 +39,24 @@ class App extends Component {
     }
     }
 
-    // Load used products
+    // Load used products listed by other buyers
     for (var i = 1; i <= productCount; i++) {
       const product = await producttracker.methods.product(i).call()
       if(product.used){
+        var dop = new Date(parseInt(product.dateOfPurchase._hex.toString(16))*1000)
+       product.dateOfPurchase = dop.toLocaleDateString('en-GB');
       this.setState({
        usedproducts: [...this.state.usedproducts, product]
       })
     }
     }
 
-    // Load owned products
+    // Load owned products of current account of metamask
     for (var i = 1; i <= productCount; i++) {
       const product = await producttracker.methods.product(i).call()
       if(!product.used && product.dateOfPurchase!=0x00 && product.ownerAddress == this.state.account){
        var dop = new Date(parseInt(product.dateOfPurchase._hex.toString(16))*1000)
-       console.log(dop.toLocaleDateString('en-GB'))
+       //console.log(dop.toLocaleDateString('en-GB'))
        product.dateOfPurchase = dop.toLocaleDateString('en-GB');
       this.setState({
        ownproducts: [...this.state.ownproducts, product]
@@ -76,6 +83,7 @@ class App extends Component {
     }
     this.addProduct = this.addProduct.bind(this)
     this.buyProduct = this.buyProduct.bind(this)
+    this.buyUsedProduct = this.buyUsedProduct.bind(this)
     this.sellProduct = this.sellProduct.bind(this)
   }
 
@@ -92,6 +100,7 @@ class App extends Component {
     }
   }
 
+  //Function definitions of the smart contract, which we call using web3 are written below
   addProduct(name, dop, warranty, price) {
     this.setState({ loading: true })
     this.state.producttracker.methods.addProduct(name, dop, warranty, price).send({ from: this.state.account })
@@ -108,6 +117,14 @@ class App extends Component {
     })
   }
 
+  buyUsedProduct(id, price) {
+    this.setState({ loading: true })
+    this.state.producttracker.methods.buyUsedProduct(id).send({ from: this.state.account, value: price })
+    .once('receipt', (receipt) => {
+      this.setState({ loading: false })
+    })
+  }
+
   sellProduct(id, price) {
     this.setState({ loading: true })
     this.state.producttracker.methods.sellProduct(id,price).send({ from: this.state.account})
@@ -116,6 +133,7 @@ class App extends Component {
     })
   }
 
+  //Render the components and also pass the state values to them (there are 2 components - Navbar and Main)
   render() {
     return (
       <div>
@@ -131,7 +149,8 @@ class App extends Component {
                   ownproducts={this.state.ownproducts}
                   addProduct={this.addProduct}
                   sellProduct={this.sellProduct}
-                  buyProduct={this.buyProduct} />
+                  buyProduct={this.buyProduct} 
+                  buyUsedProduct={this.buyUsedProduct} />
               }
           </main>
           </div>
