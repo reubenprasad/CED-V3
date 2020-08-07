@@ -12,6 +12,7 @@ contract ProductTracker {
         uint dateOfPurchase;
         uint warrantyPeriod;
         uint price;
+        bool used;
         address payable ownerAddress;
     }
 
@@ -32,7 +33,14 @@ contract ProductTracker {
         uint dateOfPurchase,
         uint warrantyPeriod,
         uint price,
+        bool used,
         address payable ownerAddress
+  );
+
+event ProductListed(
+        uint id,
+        uint price,
+        bool used
   );
 
   constructor () public {
@@ -57,7 +65,7 @@ contract ProductTracker {
        //Increment the Product Count
         productCount++;
        //Add the Product
-        product[productCount] = productDetail(productCount,_name, _dateOfPurchase, _wPeriod, _price, product_manufacturer);
+        product[productCount] = productDetail(productCount,_name, _dateOfPurchase, _wPeriod, _price, false, product_manufacturer);
        //Emit an event when product is added
         emit ProductAdded(productCount,_name, _dateOfPurchase, _wPeriod, _price, product_manufacturer);
 
@@ -72,7 +80,6 @@ contract ProductTracker {
         require(_pId > 0 && _pId <= productCount);
         //Ensure that buyer sends enough ether
         require(msg.value >= _product.price);
-        //Ensure that the product has not been purchased already ------------X
         //Transfer the ownership
         _product.ownerAddress = msg.sender;
         //Set date of purchase
@@ -82,6 +89,24 @@ contract ProductTracker {
         //Transfer Ether to the seller
         address(_seller).transfer(msg.value);
         //Emit an event
-        emit ProductPurchased(_product.id,_product.name, _product.dateOfPurchase, _product.warrantyPeriod, _product.price, msg.sender);     
+        emit ProductPurchased(_product.id,_product.name, _product.dateOfPurchase, _product.warrantyPeriod, _product.price, _product.used,msg.sender);     
+    }
+
+    function sellProduct(uint _pId, uint _price) public buy_conditions{
+       //Fetch the product
+        productDetail memory _product = product[_pId];
+        //Ensure that the product has a valid id
+        require(_pId > 0 && _pId <= productCount);
+        //Ensure that the product is not already listed for sale
+        require(!_product.used,'Product already listed');
+        //Ensure that the product has a valid id
+        require(_pId > 0 && _pId <= productCount);
+        //Check if owner is correct
+        require(_product.ownerAddress == msg.sender);
+        //Update the product
+        _product.used = true;
+        _product.price = _price;
+        product[_pId] = _product;
+        emit ProductListed(_product.id, _product.price, _product.used);
     }
 }

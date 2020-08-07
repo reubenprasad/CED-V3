@@ -41,14 +41,14 @@ contract('ProductTracker', ([manufacturer, buyer]) =>{
             assert.equal(event.ownerAddress,manufacturer,'owner is correct')
         })
 
-        it('lists products', async() =>{    //Test to check if products are listed correctly
+        it('retrieves products', async() =>{    //Test to check if products are listed correctly
             const product = await producttracker.product(productCount)
             assert.equal(product.name, 'Samsung TV','name is correct') 
             assert.equal(product.price,'1000000000000000000','price is correct')
             assert.equal(product.ownerAddress,manufacturer,'owner is correct')
         })
 
-        it('sells products', async() =>{        //Test to check the product purchase functionality
+        it('buys products', async() =>{        //Test to check the product purchase functionality
             //Track seller balance before purchase
             let oldSellerBalance
             oldSellerBalance = await web3.eth.getBalance(manufacturer)
@@ -58,6 +58,7 @@ contract('ProductTracker', ([manufacturer, buyer]) =>{
             const event = result.logs[0].args
             assert.equal(event.name, 'Samsung TV','name is correct') 
             assert.equal(event.price,'1000000000000000000','price is correct')
+            assert.equal(event.used,false,'used is correct')
             assert.equal(event.ownerAddress,buyer,'owner is correct')  //Check if owner is updated correctly
 
             //Check that the seller received funds
@@ -72,6 +73,14 @@ contract('ProductTracker', ([manufacturer, buyer]) =>{
            const expectedBalance = oldSellerBalance.add(price)
            assert.equal(newSellerBalance.toString(),expectedBalance.toString())
 
+        })
+
+        it('sells products',async() =>{
+            result = await producttracker.sellProduct(1,2,{from: buyer})
+            const event = result.logs[0].args
+            assert.equal(event.id, 1,'id is correct')
+            assert.equal(event.price,2,'price is correct')
+            assert.equal(event.used,true,'used is correct')
         })
 
     })

@@ -24,16 +24,39 @@ class App extends Component {
     this.setState({ producttracker })
     const productCount = await producttracker.methods.productCount().call()
     this.setState({ productCount })
-     // Load products
+     // Load new products
      for (var i = 1; i <= productCount; i++) {
       const product = await producttracker.methods.product(i).call()
       if(product.dateOfPurchase==0x00){
       this.setState({
-       products: [...this.state.products, product]
+       newproducts: [...this.state.newproducts, product]
       })
     }
-      console.log(product)
     }
+
+    // Load used products
+    for (var i = 1; i <= productCount; i++) {
+      const product = await producttracker.methods.product(i).call()
+      if(product.used){
+      this.setState({
+       usedproducts: [...this.state.usedproducts, product]
+      })
+    }
+    }
+
+    // Load owned products
+    for (var i = 1; i <= productCount; i++) {
+      const product = await producttracker.methods.product(i).call()
+      if(!product.used && product.dateOfPurchase!=0x00 && product.ownerAddress == this.state.account){
+       var dop = new Date(parseInt(product.dateOfPurchase._hex.toString(16))*1000)
+       console.log(dop.toLocaleDateString('en-GB'))
+       product.dateOfPurchase = dop.toLocaleDateString('en-GB');
+      this.setState({
+       ownproducts: [...this.state.ownproducts, product]
+      })
+    }
+    }
+
     this.setState({ loading: false})
   } else {
     window.alert('ProductTracker contract not deployed to detected network.')
@@ -46,11 +69,14 @@ class App extends Component {
     this.state = {
       account: '',
       productCount: 0,
-      products: [],
+      newproducts: [],
+      usedproducts: [],
+      ownproducts: [],
       loading: true
     }
     this.addProduct = this.addProduct.bind(this)
     this.buyProduct = this.buyProduct.bind(this)
+    this.sellProduct = this.sellProduct.bind(this)
   }
 
   async loadWeb3() {               //Function to load web3
@@ -82,6 +108,14 @@ class App extends Component {
     })
   }
 
+  sellProduct(id, price) {
+    this.setState({ loading: true })
+    this.state.producttracker.methods.sellProduct(id,price).send({ from: this.state.account})
+    .once('receipt', (receipt) => {
+      this.setState({ loading: false })
+    })
+  }
+
   render() {
     return (
       <div>
@@ -92,8 +126,11 @@ class App extends Component {
               { this.state.loading
                 ? <div id="loader" className="text-center"><p className="text-center">Loading...</p></div>
                 : <Main
-                  products={this.state.products}
+                  newproducts={this.state.newproducts}
+                  usedproducts={this.state.usedproducts}
+                  ownproducts={this.state.ownproducts}
                   addProduct={this.addProduct}
+                  sellProduct={this.sellProduct}
                   buyProduct={this.buyProduct} />
               }
           </main>
