@@ -1,0 +1,40 @@
+=============== Aug 8, 2020 (IST) ===============
+01:01:50.736226 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+01:01:50.772412 db@open opening
+01:01:50.774423 version@stat F·[] S·0B[] Sc·[]
+01:01:50.777438 db@janitor F·2 G·0
+01:01:50.777438 db@open done T·5.0257ms
+01:01:50.789731 db@close closing
+01:01:50.796567 db@close done T·6.8359ms
+=============== Aug 8, 2020 (IST) ===============
+01:03:55.607984 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+01:03:55.607984 version@stat F·[] S·0B[] Sc·[]
+01:03:55.607984 db@open opening
+01:03:55.608988 journal@recovery F·1
+01:03:55.611010 journal@recovery recovering @1
+01:03:55.619051 memdb@flush created L0@2 N·12 S·796B "Hr\x83..\x8a\xbc\b,v5":"\xdf|\x86..\x04ٓ,v2"
+01:03:55.622056 version@stat F·[1] S·796B[796B] Sc·[0.25]
+01:03:55.631116 db@janitor F·3 G·0
+01:03:55.632109 db@open done T·24.1251ms
+01:13:53.646995 db@close closing
+01:13:53.709435 db@close done T·62.4395ms
+=============== Aug 8, 2020 (IST) ===============
+01:14:56.343425 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+01:14:56.343425 version@stat F·[1] S·796B[796B] Sc·[0.25]
+01:14:56.344430 db@open opening
+01:14:56.344430 journal@recovery F·1
+01:14:56.346451 journal@recovery recovering @3
+01:14:56.353478 memdb@flush created L0@5 N·1409 S·72KiB "5\x98\n..\x00D5,v1422":"\xb8\t\t..\x14\x10\xf0,v1420"
+01:14:56.356603 version@stat F·[2] S·73KiB[73KiB] Sc·[0.50]
+01:14:56.371593 db@janitor F·4 G·0
+01:14:56.371593 db@open done T·27.1627ms
+=============== Aug 8, 2020 (IST) ===============
+02:54:29.712732 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+02:54:29.712732 version@stat F·[2] S·73KiB[73KiB] Sc·[0.50]
+02:54:29.713737 db@open opening
+02:54:29.713737 journal@recovery F·1
+02:54:29.914923 journal@recovery recovering @6
+02:54:29.924273 memdb@flush created L0@8 N·2524 S·133KiB "H\x01\x82..C\xfa\xbd,v1957":"r\x00\x00..,\xa0\x99,v3943"
+02:54:29.927110 version@stat F·[3] S·206KiB[206KiB] Sc·[0.75]
+02:54:29.942198 db@janitor F·5 G·0
+02:54:29.942198 db@open done T·228.4611ms
